@@ -160,7 +160,7 @@ def call_model(client: Groq, model: str, product: Dict[str, Any], review_text: s
 
 
 def main():
-    products = load_products("products.json")
+    products = load_products("product.json")
     reviews = load_reviews("reviews.json")
     client = get_client()
 

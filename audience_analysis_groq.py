@@ -159,6 +159,13 @@ def extract_json_from_model_response(text: str) -> Any:
     # ничего не нашли
     return {"__raw_response": text}
 
+THINK_RE = re.compile(r"<think>.*?</think>", re.DOTALL | re.IGNORECASE)
+
+def strip_think_tags(text: str) -> str:
+    """
+    Удаляет блоки вида <think>...</think> из ответа модели, если они есть.
+    """
+    return THINK_RE.sub("", text).strip()
 
 def call_model_and_parse(client: Groq, model: str, system_prompt: str, user_prompt: str) -> Any:
     completion = client.chat.completions.create(
@@ -172,18 +179,8 @@ def call_model_and_parse(client: Groq, model: str, system_prompt: str, user_prom
     )
     content = completion.choices[0].message.content
     parsed = extract_json_from_model_response(content)
-    return {"parsed": parsed}
+    return { "parsed": parsed}
 
-def clean_think_blocks(text: str) -> str:
-    """
-    Удаляет блоки <think>...</think> и лишние служебные вставки,
-    возвращая "чистый" текст.
-    """
-    # Удаляем <think>...</think> (DOTALL)
-    cleaned = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL | re.IGNORECASE)
-    # также убираем xml-like оставшиеся теги, если нужно
-    cleaned = cleaned.strip()
-    return cleaned
 
 def build_user_prompt_for_product(product: Dict[str, Any], sample_reviews: List[str]) -> str:
     # создаём аккуратную строку характеристик
