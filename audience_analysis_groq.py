@@ -172,8 +172,18 @@ def call_model_and_parse(client: Groq, model: str, system_prompt: str, user_prom
     )
     content = completion.choices[0].message.content
     parsed = extract_json_from_model_response(content)
-    return {"raw": content, "parsed": parsed}
+    return {"parsed": parsed}
 
+def clean_think_blocks(text: str) -> str:
+    """
+    Удаляет блоки <think>...</think> и лишние служебные вставки,
+    возвращая "чистый" текст.
+    """
+    # Удаляем <think>...</think> (DOTALL)
+    cleaned = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL | re.IGNORECASE)
+    # также убираем xml-like оставшиеся теги, если нужно
+    cleaned = cleaned.strip()
+    return cleaned
 
 def build_user_prompt_for_product(product: Dict[str, Any], sample_reviews: List[str]) -> str:
     # создаём аккуратную строку характеристик
@@ -266,12 +276,9 @@ def main():
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(results_out, f, ensure_ascii=False, indent=2)
 
-    # также человекочитаемый вариант
-    pretty = args.out.replace(".json", "_pretty.json")
-    with open(pretty, "w", encoding="utf-8") as f:
-        json.dump(results_out, f, ensure_ascii=False, indent=2)
+    
 
-    print(f"[ok] Сохранено в {out_path} и {pretty}")
+    print(f"[ok] Сохранено в {out_path}")
 
 
 if __name__ == "__main__":

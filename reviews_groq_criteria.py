@@ -1,26 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-reviews_groq_criteria.py
-
-Скрипт для анализа отзывов с помощью Groq API и кастомного промпта.
-
-- Берёт товары из products.json
-- Берёт отзывы из reviews.json
-- Для каждого (отзыв, модель) делает:
-    - system prompt: аналитик отзывов
-    - user prompt: информация о товаре + текст отзыва + критерии
-    - Модель сама определяет тональность отзыва
-- Результат сохраняет в results_criteria.json
-
-Перед запуском:
-    pip install groq
-    export GROQ_API_KEY="твой_ключ"
-
-Файлы рядом со скриптом:
-    products.json
-    reviews.json
-"""
-
 import os
 import json
 import re
@@ -28,18 +5,11 @@ from typing import Dict, Any, List
 
 from groq import Groq
 
-# =========================
-# 1. SYSTEM PROMPT
-# =========================
-
 SYSTEM_PROMPT = """
 Ты — аналитик отзывов с экспертизой в выявлении скрытых паттернов, мотивации пользователя и потенциальных манипуляций.
 Твоя задача — не просто суммировать отзыв, а провести его многоаспектную оценку по ключевым критериям.
 """.strip()
 
-# =========================
-# 2. USER PROMPT BUILDER
-# =========================
 
 def build_user_prompt(product: Dict[str, Any], review_text: str) -> str:
     """
@@ -151,9 +121,6 @@ MODELS: List[str] = [
     "qwen/qwen3-32b",
 ]
 
-# =========================
-# 5. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-# =========================
 
 THINK_RE = re.compile(r"<think>.*?</think>", re.DOTALL | re.IGNORECASE)
 
@@ -186,7 +153,6 @@ def call_model(client: Groq, model: str, product: Dict[str, Any], review_text: s
         parsed = json.loads(content)
         return parsed
     except json.JSONDecodeError:
-        # если модель всё равно не попала в JSON — сохраняем сырой текст
         return {
             "raw_response": content,
             "parse_error": "JSONDecodeError"
