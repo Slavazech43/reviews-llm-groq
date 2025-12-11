@@ -1,25 +1,3 @@
-#!/usr/bin/env python3
-# coding: utf-8
-"""
-audience_analysis_groq.py
-
-Универсальный скрипт для анализа целевой аудитории (ЦА) по продукту и отзывам,
-использующий Groq API.
-
-Вход:
-  --product <path to products.json>   (может быть single object or list)
-  --reviews <path to results.json>     (может быть list of model outputs or list of raw reviews)
-
-Выход:
-  audience_analysis_results.json (машиночитаемый)
-  audience_analysis_results_pretty.json (читаемый формат)
-
-Принципы:
-- корректно работает с JSON-структурами list/dict
-- модель сама определяет тональность/категории аудитории
-- модель обязана вернуть только JSON (скрипт постарается найти/парсить первый JSON в ответе)
-"""
-
 import os
 import re
 import json
@@ -28,8 +6,6 @@ from typing import Any, Dict, List, Optional
 from groq import Groq
 
 MODELS = [
-    "llama-3.1-8b-instant",
-    "llama-3.3-70b-versatile",
     "qwen/qwen3-32b",
 ]
 
